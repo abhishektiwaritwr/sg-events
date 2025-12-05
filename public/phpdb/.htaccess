@@ -1,0 +1,3 @@
+deny from all
+allow from 125.20.70.10
+allow from 103.78.201.50
