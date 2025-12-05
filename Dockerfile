@@ -6,19 +6,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   && docker-php-ext-install pdo pdo_mysql mbstring zip \
   && rm -rf /var/lib/apt/lists/*
 
-# Composer (copy from official image)
+# copy composer binary from composer image (optional)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy composer files and install dependencies (if present)
-COPY composer.json composer.lock ./
-RUN if [ -f composer.json ]; then composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader || true; fi
-
-# Copy application code
+# Copy entire project (we rely on vendor/ being committed in repo)
 COPY . .
 
-# Enable rewrite for Laravel and set permissions
+# Ensure permissions
 RUN a2enmod rewrite || true
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
